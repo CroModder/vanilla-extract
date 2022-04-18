@@ -27,7 +27,7 @@ describe('identifier', () => {
     );
   });
 
-  describe('with custom callback', ()=>{
+  describe('with custom callback', () => {
     beforeAll(() => {
       setAdapter({
         appendCss: () => {},
@@ -39,13 +39,13 @@ describe('identifier', () => {
           `abc_${dbg}_${scope}_${index}`,
       });
     });
-  
+
     afterAll(() => {
       removeAdapter();
     });
-  
+
     it('defers to a custom callback', () => {
       expect(generateIdentifier(`a`)).toMatchInlineSnapshot(`"abc_a_test_0"`);
     });
-  })
+  });
 });
