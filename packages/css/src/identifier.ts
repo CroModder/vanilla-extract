@@ -20,23 +20,31 @@ function getDevPrefix(debugId: string | undefined) {
 }
 
 export function generateIdentifier(debugId: string | undefined) {
-  // Convert ref count to base 36 for optimal hash lengths
-  const refCount = getAndIncrementRefCounter().toString(36);
+  const refCount = getAndIncrementRefCounter();
   const { filePath, packageName } = getFileScope();
 
-  const fileScopeHash = hash(
-    packageName ? `${packageName}${filePath}` : filePath,
-  );
+  const fileScopeStr = packageName ? `${packageName}${filePath}` : filePath;
 
-  let identifier = `${fileScopeHash}${refCount}`;
+  const opt = getIdentOption();
 
-  if (getIdentOption() === 'debug') {
-    const devPrefix = getDevPrefix(debugId);
+  if (opt === 'debug' || opt === 'short') {
+    // Convert ref count to base 36 for optimal hash lengths
+    const refCountStr = refCount.toString(36);
+    const fileScopeHash = hash(fileScopeStr);
+    let identifier = `${fileScopeHash}${refCountStr}`;
 
-    if (devPrefix) {
-      identifier = `${devPrefix}__${identifier}`;
+    if (opt === 'debug') {
+      const devPrefix = getDevPrefix(debugId);
+
+      if (devPrefix) {
+        // Convert ref count to base 36 for optimal hash lengths
+        identifier = `${devPrefix}__${hash(fileScopeStr)}${refCount.toString(
+          36,
+        )}`;
+      }
     }
+    return identifier;
+  } else {
+    return opt(fileScopeStr, refCount, debugId);
   }
-
-  return identifier.match(/^[0-9]/) ? `_${identifier}` : identifier;
 }

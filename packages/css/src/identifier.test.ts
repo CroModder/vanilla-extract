@@ -1,13 +1,24 @@
+import { removeAdapter, setAdapter } from './adapter';
 import { setFileScope, endFileScope } from './fileScope';
 import { generateIdentifier } from './identifier';
 
 describe('identifier', () => {
   beforeAll(() => {
     setFileScope('test');
+    setAdapter({
+      appendCss: () => {},
+      registerClassName: () => {},
+      onEndFileScope: () => {},
+      registerComposition: () => {},
+      markCompositionUsed: () => {},
+      getIdentOption: () => (scope, index, dbg) =>
+        `abc_${dbg}_${scope}_${index}`,
+    });
   });
 
   afterAll(() => {
     endFileScope();
+    removeAdapter();
   });
 
   it(`should create a valid identifier`, () => {
@@ -24,5 +35,9 @@ describe('identifier', () => {
     expect(generateIdentifier('debug and more')).toMatchInlineSnapshot(
       `"debug_and_more__skkcyc2"`,
     );
+  });
+
+  it('defers to a custom callback', () => {
+    expect(generateIdentifier(`a`)).toMatchInlineSnapshot(`"abc_a_??_0"`);
   });
 });
