@@ -45,7 +45,13 @@ describe('identifier', () => {
     });
 
     it('defers to a custom callback', () => {
-      expect(generateIdentifier(`a`)).toMatchInlineSnapshot(`"abc_a_test_0"`);
+      expect(generateIdentifier(`a`)).toMatchInlineSnapshot(`"abc_a_test_3"`);
+    });
+
+    it('rejects invalid identifiers', () => {
+      // getIdentOption() does not remove spaces from the debug info so the
+      // resulting identifier should be invalid here.
+      expect(() => generateIdentifier(`a b`)).toThrow();
     });
   });
 });
