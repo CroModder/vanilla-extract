@@ -5,20 +5,10 @@ import { generateIdentifier } from './identifier';
 describe('identifier', () => {
   beforeAll(() => {
     setFileScope('test');
-    setAdapter({
-      appendCss: () => {},
-      registerClassName: () => {},
-      onEndFileScope: () => {},
-      registerComposition: () => {},
-      markCompositionUsed: () => {},
-      getIdentOption: () => (scope, index, dbg) =>
-        `abc_${dbg}_${scope}_${index}`,
-    });
   });
 
   afterAll(() => {
     endFileScope();
-    removeAdapter();
   });
 
   it(`should create a valid identifier`, () => {
@@ -37,7 +27,25 @@ describe('identifier', () => {
     );
   });
 
-  it('defers to a custom callback', () => {
-    expect(generateIdentifier(`a`)).toMatchInlineSnapshot(`"abc_a_??_0"`);
-  });
+  describe('with custom callback', ()=>{
+    beforeAll(() => {
+      setAdapter({
+        appendCss: () => {},
+        registerClassName: () => {},
+        onEndFileScope: () => {},
+        registerComposition: () => {},
+        markCompositionUsed: () => {},
+        getIdentOption: () => (scope, index, dbg) =>
+          `abc_${dbg}_${scope}_${index}`,
+      });
+    });
+  
+    afterAll(() => {
+      removeAdapter();
+    });
+  
+    it('defers to a custom callback', () => {
+      expect(generateIdentifier(`a`)).toMatchInlineSnapshot(`"abc_a_test_0"`);
+    });
+  })
 });
